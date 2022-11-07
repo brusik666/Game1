@@ -8,19 +8,30 @@
 import Foundation
 import SpriteKit
 
+class SKPlayerNode: SKShapeNode {
+    func jump() {
+        self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50))
+    }
+}
+
 class GameScene: SKScene {
     
     var cameraNode: SKCameraNode?
+    let player = SKPlayerNode(rectOf: CGSize(width: 32, height: 100))
 
-    
     override func didMove(to view: SKView) {
-        
+
+        setCamera()
         createBackgroundNode()
-        cameraNode = SKCameraNode()
-        camera = cameraNode
-        addChild(cameraNode!)
         createControlButtons()
         
+        player.fillColor = SKColor.cyan
+        player.zPosition = 1
+        player.physicsBody = SKPhysicsBody()
+        player.physicsBody?.affectedByGravity = false
+        cameraNode?.addChild(player)
+        
+        physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
     }
     
     
@@ -28,6 +39,7 @@ class GameScene: SKScene {
         guard let touch = touches.first else { return }
         let touchLocation = touch.location(in: self)
         let touhedNode = atPoint(touchLocation)
+        //player.physicsBody?.affectedByGravity = true
         if let name = touhedNode.name {
             handleControlButtonsTaps(sender: name)
         }
@@ -48,8 +60,11 @@ class GameScene: SKScene {
     }
     
     private func createControlButtons() {
+        
+        let buttonsYposition = -(frame.midY - 50)
+        
         let leftButtonLabel = SKLabelNode(text: "<")
-        leftButtonLabel.position = CGPoint(x: -(frame.midX - 50), y: -(frame.midY - 50))
+        leftButtonLabel.position = CGPoint(x: -(frame.midX - 50), y: buttonsYposition)
         leftButtonLabel.fontColor = SKColor.black
         leftButtonLabel.fontSize = 50
         leftButtonLabel.zPosition = 10
@@ -57,14 +72,31 @@ class GameScene: SKScene {
         cameraNode?.addChild(leftButtonLabel)
         
         let rightButtonLabel = SKLabelNode(text: ">")
-        rightButtonLabel.position = CGPoint(x: leftButtonLabel.position.x + 100, y: -(frame.midY - 50))
+        rightButtonLabel.position = CGPoint(x: leftButtonLabel.position.x + 100, y: buttonsYposition)
         rightButtonLabel.fontSize = 50
         rightButtonLabel.zPosition = 10
         rightButtonLabel.name = "rightButton"
         rightButtonLabel.fontColor = SKColor.black
         cameraNode?.addChild(rightButtonLabel)
-        let jumpButtonLabel = SKLabelNode()
-        let fireButtonLabel = SKLabelNode()
+        
+        let jumpButtonLabel = SKShapeNode(circleOfRadius: 25)
+        jumpButtonLabel.position = CGPoint(x: frame.midX - 50, y: buttonsYposition)
+        jumpButtonLabel.name = "jumpButton"
+        jumpButtonLabel.fillColor = SKColor.green
+        jumpButtonLabel.zPosition = 10
+        cameraNode?.addChild(jumpButtonLabel)
+        
+        let fireButtonLabel = SKShapeNode(circleOfRadius: 25)
+        fireButtonLabel.position = CGPoint(x: jumpButtonLabel.position.x - 75, y: buttonsYposition)
+        fireButtonLabel.fillColor = SKColor.red
+        fireButtonLabel.zPosition = 10
+        cameraNode?.addChild(fireButtonLabel)
+    }
+    
+    private func setCamera() {
+        cameraNode = SKCameraNode()
+        camera = cameraNode
+        addChild(cameraNode!)
     }
     
     private func moveCameraForward() {
@@ -89,7 +121,7 @@ class GameScene: SKScene {
         case "leftButton": moveCameraBackward()
         case "rightButton": moveCameraForward()
         case "fireButton": break
-        case "jumpButton": break
+        case "jumpButton": player.jump()
         default: break
         }
     }

@@ -23,10 +23,9 @@ class GameViewController: UIViewController {
     
     private func configureGameScene() {
         let skView = view as! SKView
-        let scene = GameScene(size: self.view.bounds.size)
-        print(scene.size)
+        let scene = GameScene()
         self.scene = scene
-        scene.scaleMode = .aspectFill
+        scene.scaleMode = .resizeFill
         scene.anchorPoint = CGPoint(x: 0.0, y: 0.0)
         
         

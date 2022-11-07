@@ -44,6 +44,7 @@
 		EE42BE6029185657003EF5A5 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				EE52889D2915176800B41CAF /* StartViewController.swift */,
 				EEC8D6C32915398800E588F3 /* GameViewController.swift */,
 			);
 			path = ViewControllers;
@@ -89,7 +90,6 @@
 			children = (
 				EE5288A22915176D00B41CAF /* Assets.xcassets */,
 				EE5288A72915176D00B41CAF /* Info.plist */,
-				EE52889D2915176800B41CAF /* StartViewController.swift */,
 				EE42BE6329185698003EF5A5 /* Support */,
 				EE42BE6029185657003EF5A5 /* ViewControllers */,
 				EE42BE622918567E003EF5A5 /* Scenes */,

@@ -10,7 +10,7 @@ import UIKit
 import GameKit
 
 class GameViewController: UIViewController {
-    
+
     var scene: GameScene!
 
     override func viewDidLoad() {
@@ -33,5 +33,6 @@ class GameViewController: UIViewController {
         skView.ignoresSiblingOrder = true
         skView.showsFPS = true
         skView.showsNodeCount = true
+        //skView.showsPhysics = true
     }
 }

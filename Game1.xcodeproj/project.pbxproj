@@ -14,6 +14,7 @@
 		EE5288A32915176D00B41CAF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EE5288A22915176D00B41CAF /* Assets.xcassets */; };
 		EE5288A62915176D00B41CAF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EE5288A42915176D00B41CAF /* LaunchScreen.storyboard */; };
 		EE5288AE29151C5300B41CAF /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5288AD29151C5300B41CAF /* GameScene.swift */; };
+		EE9F6BCA291B0D0700566F0C /* SKPlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9F6BC9291B0D0700566F0C /* SKPlayerNode.swift */; };
 		EEC8D6C42915398800E588F3 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC8D6C32915398800E588F3 /* GameViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +28,7 @@
 		EE5288A52915176D00B41CAF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		EE5288A72915176D00B41CAF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EE5288AD29151C5300B41CAF /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
+		EE9F6BC9291B0D0700566F0C /* SKPlayerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKPlayerNode.swift; sourceTree = "<group>"; };
 		EEC8D6C32915398800E588F3 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -93,6 +95,7 @@
 				EE42BE6329185698003EF5A5 /* Support */,
 				EE42BE6029185657003EF5A5 /* ViewControllers */,
 				EE42BE622918567E003EF5A5 /* Scenes */,
+				EE9F6BC9291B0D0700566F0C /* SKPlayerNode.swift */,
 			);
 			path = Game1;
 			sourceTree = "<group>";
@@ -172,6 +175,7 @@
 				EE52889E2915176800B41CAF /* StartViewController.swift in Sources */,
 				EE52889A2915176800B41CAF /* AppDelegate.swift in Sources */,
 				EE5288AE29151C5300B41CAF /* GameScene.swift in Sources */,
+				EE9F6BCA291B0D0700566F0C /* SKPlayerNode.swift in Sources */,
 				EE52889C2915176800B41CAF /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

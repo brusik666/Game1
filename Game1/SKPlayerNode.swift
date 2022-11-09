@@ -13,23 +13,28 @@ class SKPlayerNode: SKSpriteNode {
         self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 500))
     }
     
-    func runForwardAnimation() {
+    func runForwardAnimation(direction: String) {
         var runningTextures = [SKTexture]()
         for i in 1...9 {
-            runningTextures.append(SKTexture(imageNamed: "lisRun\(i)"))
+            if direction == "forward" {
+                runningTextures.append(SKTexture(imageNamed: "foxRun\(i)"))
+            } else {
+                runningTextures.append(SKTexture(imageNamed: "foxRun\(i)reversed"))
+            }
         }
         let runningAnimation = SKAction.animate(with: runningTextures, timePerFrame: 0.05)
         let loop = SKAction.repeatForever(runningAnimation)
+        self.removeAction(forKey: "idle")
         self.run(loop, withKey: "runningLoop")
     }
     
     func idleAnimation() {
         var idleTextures = [SKTexture]()
         for i in 1...6 {
-            idleTextures.append(SKTexture(imageNamed: "lisIDLE\(i)"))
+            idleTextures.append(SKTexture(imageNamed: "foxIDLE\(i)"))
         }
         let idleAnimation = SKAction.animate(with: idleTextures, timePerFrame: 0.15)
         let repeatAction = SKAction.repeatForever(idleAnimation)
-        self.run(repeatAction)
+        self.run(repeatAction, withKey: "idle")
     }
 }

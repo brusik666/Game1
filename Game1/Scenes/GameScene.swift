@@ -13,29 +13,32 @@ class GameScene: SKScene {
     var groundNode: SKSpriteNode!
     var backgroundNode: SKSpriteNode!
     var cameraNode: SKCameraNode!
-    let player = SKPlayerNode(imageNamed: "lisIDLE1")
+    let player = SKPlayerNode(imageNamed: "foxIDLE1")
+    var isSoundOn: Bool = false
+    var rightButtonLabel: SKLabelNode!
     
+    override init(size: CGSize) {
+        super.init(size: size)
+    }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-
     override func didMove(to view: SKView) {
-
+        
+        self.view?.isMultipleTouchEnabled = true
+        if isSoundOn {
+            let backGroundMusic = SKAudioNode(fileNamed: "mainTheme")
+            addChild(backGroundMusic)
+        }
         createBackgroundNode()
         setCamera()
         createControlButtons()
-        self.view?.isMultipleTouchEnabled = true
-        player.zPosition = 1
-        player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size)
-        player.physicsBody?.affectedByGravity = false
-        player.physicsBody?.allowsRotation = false
-        player.physicsBody?.isDynamic = true
-        player.physicsBody?.mass = 1
-        player.xScale = 0.5
-        player.yScale = 0.5
-        
-        cameraNode?.addChild(player)
+        setupPlayerNode()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.player.physicsBody?.affectedByGravity = true
+            self.player.idleAnimation()
         }
     }
     
@@ -44,7 +47,6 @@ class GameScene: SKScene {
         guard let touch = touches.first else { return }
         let touchLocation = touch.location(in: self)
         let touhedNode = atPoint(touchLocation)
-        //player.physicsBody?.affectedByGravity = true
         if let name = touhedNode.name {
             handleControlButtonsTaps(sender: name)
         }
@@ -58,11 +60,29 @@ class GameScene: SKScene {
         switch touchedNode.name {
         case "leftButton", "rightButton":
             stopCamera()
+            //rightButtonLabel.isUserInteractionEnabled = true
             player.removeAction(forKey: "runningLoop")
             player.idleAnimation()
         default: return
         }
+    }
+    
+    private func setupPlayerNode() {
         
+        player.zPosition = 1
+        player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size)
+        player.physicsBody?.affectedByGravity = false
+        player.physicsBody?.allowsRotation = false
+        player.physicsBody?.isDynamic = true
+        player.physicsBody?.mass = 1
+        player.xScale = 0.5
+        player.yScale = 0.5
+        player.position.x = -size.width/4
+        cameraNode?.addChild(player)
+        
+    }
+    
+    private func createTerrain() {
         
     }
     
@@ -101,7 +121,7 @@ class GameScene: SKScene {
         
         cameraNode?.addChild(leftButtonLabel)
         
-        let rightButtonLabel = SKLabelNode(text: ">")
+        rightButtonLabel = SKLabelNode(text: ">")
         rightButtonLabel.position = CGPoint(x: leftButtonLabel.position.x + 100, y: buttonsYposition)
         rightButtonLabel.fontSize = 50
         rightButtonLabel.zPosition = 10
@@ -133,19 +153,40 @@ class GameScene: SKScene {
         addChild(cameraNode!)
     }
     
+    private func throwShuriken() {
+        let shuriken = SKSpriteNode(imageNamed: "shuriken")
+        shuriken.position = CGPoint(x: player.position.x + player.size.width/2, y: player.position.y - 10)
+        shuriken.size.height = player.size.height/3.5
+        shuriken.size.width = player.size.width/3.5
+        shuriken.physicsBody = SKPhysicsBody(circleOfRadius: shuriken.size.width/2)
+        shuriken.physicsBody?.isDynamic = false
+        shuriken.physicsBody?.categoryBitMask = PhysicsCategory.shuriken.rawValue
+        shuriken.physicsBody?.contactTestBitMask = PhysicsCategory.monster.rawValue
+        shuriken.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
+        shuriken.physicsBody?.usesPreciseCollisionDetection = true
+        cameraNode.addChild(shuriken)
+        
+        let direction = CGPoint(x: frame.width/2 + shuriken.size.width, y: player.position.y)
+        let throwAction = SKAction.move(to: direction, duration: 0.5)
+        let throwActionDone = SKAction.removeFromParent()
+        let thorwSequence = SKAction.sequence([throwAction, throwActionDone])
+        shuriken.run(thorwSequence)
+    }
+    
     private func moveCameraForward() {
-
+        
         let moveAction = SKAction.move(by: CGVector(dx: 50, dy: 0), duration: 0.2)
         let repeatMove = SKAction.repeatForever(moveAction)
-        cameraNode?.run(repeatMove)
-        player.runForwardAnimation()
+        cameraNode?.run(repeatMove, withKey: "moveForward")
+        player.runForwardAnimation(direction: "forward")
     }
     
     private func moveCameraBackward() {
+        
         let moveAction  = SKAction.move(by: CGVector(dx: -50, dy: 0), duration: 0.2)
         let repeatMove = SKAction.repeatForever(moveAction)
         cameraNode?.run(repeatMove)
-        player.runForwardAnimation()
+        player.runForwardAnimation(direction: "backward")
     }
     
     private func stopCamera() {
@@ -154,13 +195,57 @@ class GameScene: SKScene {
     
     private func handleControlButtonsTaps(sender: String) {
         switch sender {
-        case "leftButton": moveCameraBackward()
-        case "rightButton": moveCameraForward()
-        case "fireButton": break
+        case "leftButton":
+            moveCameraBackward()
+        case "rightButton":
+            moveCameraForward()
+        case "fireButton":
+            throwShuriken()
         case "jumpButton":
             player.jump()
             //player.physicsBody?.affectedByGravity = true
         default: break
         }
     }
+}
+
+extension GameScene {
+    enum PhysicsCategory: UInt32 {
+        case none = 0
+        case player = 1
+        case shuriken = 2
+        case monster = 4
+    }
+}
+
+func +(left: CGPoint, right: CGPoint) -> CGPoint {
+  return CGPoint(x: left.x + right.x, y: left.y + right.y)
+}
+
+func -(left: CGPoint, right: CGPoint) -> CGPoint {
+  return CGPoint(x: left.x - right.x, y: left.y - right.y)
+}
+
+func *(point: CGPoint, scalar: CGFloat) -> CGPoint {
+  return CGPoint(x: point.x * scalar, y: point.y * scalar)
+}
+
+func /(point: CGPoint, scalar: CGFloat) -> CGPoint {
+  return CGPoint(x: point.x / scalar, y: point.y / scalar)
+}
+
+#if !(arch(x86_64) || arch(arm64))
+  func sqrt(a: CGFloat) -> CGFloat {
+    return CGFloat(sqrtf(Float(a)))
+  }
+#endif
+
+extension CGPoint {
+  func length() -> CGFloat {
+    return sqrt(x*x + y*y)
+  }
+  
+  func normalized() -> CGPoint {
+    return self / length()
+  }
 }

@@ -25,7 +25,7 @@
                                         <buttonConfiguration key="configuration" style="plain" title="START GAME"/>
                                         <connections>
                                             <action selector="startGameButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Kg5-Kw-vyi"/>
-                                            <segue destination="tad-rC-3xb" kind="show" id="Pvr-xQ-iPx"/>
+                                            <segue destination="tad-rC-3xb" kind="show" destinationCreationSelector="startGameSegue:" id="Pvr-xQ-iPx"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9YE-Ze-8fO">

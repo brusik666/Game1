@@ -8,6 +8,8 @@
 import UIKit
 
 class StartViewController: UIViewController {
+    
+    var isSoundOn: Bool = false
 
     @IBOutlet weak var switchSoundButton: UIButton!
     
@@ -18,6 +20,17 @@ class StartViewController: UIViewController {
     @IBAction func startGameButtonTapped(_ sender: Any) {
     }
     @IBAction func switchSoundButtonTapped(_ sender: Any) {
+        switch isSoundOn {
+        case false:
+            isSoundOn = true
+            switchSoundButton.titleLabel?.text = "SOUND OFF"
+        case true:
+            isSoundOn = false
+            switchSoundButton.titleLabel?.text = "SOUND ON"
+        }
+    }
+    @IBSegueAction func startGameSegue(_ coder: NSCoder) -> GameViewController? {
+        return GameViewController(coder: coder, sounds: isSoundOn)
     }
 }
 

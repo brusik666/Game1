@@ -10,21 +10,30 @@ import UIKit
 import GameKit
 
 class GameViewController: UIViewController {
-
-    var scene: GameScene!
-
+    
+    private var scoreLabel: UILabel!
+    var scene: GameScene
+    
+    init?(coder: NSCoder, sounds: Bool) {
+        self.scene = GameScene(size: UIScreen.main.bounds.size)
+        self.scene.isSoundOn = sounds
+        super.init(coder: coder)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
         navigationItem.hidesBackButton = true
         configureGameScene()
-        
     }
     
     private func configureGameScene() {
         let skView = view as! SKView
-        let scene = GameScene()
-        self.scene = scene
         scene.scaleMode = .resizeFill
         scene.anchorPoint = CGPoint(x: 0.0, y: 0.0)
         

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EE310FE3291C1E7C00013FAB /* PhysicsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE310FE2291C1E7C00013FAB /* PhysicsCategory.swift */; };
+		EE310FE5291C2E3100013FAB /* 420612__glaneur-de-sons__sword-swing-b-strong-02.wav in Resources */ = {isa = PBXBuildFile; fileRef = EE310FE4291C2E3100013FAB /* 420612__glaneur-de-sons__sword-swing-b-strong-02.wav */; };
 		EE52889A2915176800B41CAF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5288992915176800B41CAF /* AppDelegate.swift */; };
 		EE52889C2915176800B41CAF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE52889B2915176800B41CAF /* SceneDelegate.swift */; };
 		EE52889E2915176800B41CAF /* StartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE52889D2915176800B41CAF /* StartViewController.swift */; };
@@ -20,6 +22,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EE310FE2291C1E7C00013FAB /* PhysicsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsCategory.swift; sourceTree = "<group>"; };
+		EE310FE4291C2E3100013FAB /* 420612__glaneur-de-sons__sword-swing-b-strong-02.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = "420612__glaneur-de-sons__sword-swing-b-strong-02.wav"; path = "../../../../Downloads/420612__glaneur-de-sons__sword-swing-b-strong-02.wav"; sourceTree = "<group>"; };
+		EE310FE6291C2E3600013FAB /* shurikenSwing.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shurikenSwing.wav; sourceTree = "<group>"; };
 		EE5288962915176800B41CAF /* Game1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Game1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE5288992915176800B41CAF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EE52889B2915176800B41CAF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -92,6 +97,7 @@
 		EE5288982915176800B41CAF /* Game1 */ = {
 			isa = PBXGroup;
 			children = (
+				EE310FE4291C2E3100013FAB /* 420612__glaneur-de-sons__sword-swing-b-strong-02.wav */,
 				EE9F6BCB291B264700566F0C /* Sounds */,
 				EE5288A22915176D00B41CAF /* Assets.xcassets */,
 				EE5288A72915176D00B41CAF /* Info.plist */,
@@ -99,6 +105,7 @@
 				EE42BE6029185657003EF5A5 /* ViewControllers */,
 				EE42BE622918567E003EF5A5 /* Scenes */,
 				EE9F6BC9291B0D0700566F0C /* SKPlayerNode.swift */,
+				EE310FE2291C1E7C00013FAB /* PhysicsCategory.swift */,
 			);
 			path = Game1;
 			sourceTree = "<group>";
@@ -106,6 +113,7 @@
 		EE9F6BCB291B264700566F0C /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				EE310FE6291C2E3600013FAB /* shurikenSwing.wav */,
 				EE9F6BCC291B265C00566F0C /* mainTheme.mp3 */,
 			);
 			path = Sounds;
@@ -171,6 +179,7 @@
 			files = (
 				EE5288A62915176D00B41CAF /* LaunchScreen.storyboard in Resources */,
 				EE9F6BCD291B265C00566F0C /* mainTheme.mp3 in Resources */,
+				EE310FE5291C2E3100013FAB /* 420612__glaneur-de-sons__sword-swing-b-strong-02.wav in Resources */,
 				EE5288A32915176D00B41CAF /* Assets.xcassets in Resources */,
 				EE5288A12915176800B41CAF /* Main.storyboard in Resources */,
 			);
@@ -189,6 +198,7 @@
 				EE5288AE29151C5300B41CAF /* GameScene.swift in Sources */,
 				EE9F6BCA291B0D0700566F0C /* SKPlayerNode.swift in Sources */,
 				EE52889C2915176800B41CAF /* SceneDelegate.swift in Sources */,
+				EE310FE3291C1E7C00013FAB /* PhysicsCategory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

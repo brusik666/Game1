@@ -11,9 +11,9 @@ import SpriteKit
 class GameScene: SKScene {
     
     var groundNode: SKSpriteNode!
-    var backgroundNode: SKSpriteNode!
+    var backgroundNode: BackgroundNode!
     var cameraNode: SKCameraNode!
-    let player = SKPlayerNode(imageNamed: "foxIDLE1")
+    let player = PlayerNode(imageNamed: "foxIDLE1")
     var isSoundOn: Bool = false
     var rightButtonLabel: SKLabelNode!
     var hearts = [SKLabelNode]()
@@ -30,13 +30,13 @@ class GameScene: SKScene {
         
         self.view?.isMultipleTouchEnabled = true
         if isSoundOn {
-            let backGroundMusic = SKAudioNode(fileNamed: "mainTheme")
-            addChild(backGroundMusic)
+            //let backGroundMusic = SKAudioNode(fileNamed: "mainTheme")
+            //addChild(backGroundMusic)
         }
-        createBackgroundNode()
+        createTerrain()
+        setupPlayerNode()
         setCamera()
         createControlButtons()
-        setupPlayerNode()
         createHearts()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.player.physicsBody?.affectedByGravity = true
@@ -61,32 +61,28 @@ class GameScene: SKScene {
         let touchedNode = atPoint(touchLocation)
         switch touchedNode.name {
         case "leftButton", "rightButton":
-            stopCamera()
-            //rightButtonLabel.isUserInteractionEnabled = true
-            player.removeAction(forKey: "runningLoop")
-            player.idleAnimation()
+            player.stopRunning()
         default: return
         }
     }
     
     private func setupPlayerNode() {
-        
-        player.zPosition = 1
-        player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size)
+        player.zPosition = 2
+        //player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size)
+        player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width/2, height: player.size.height))
         player.physicsBody?.affectedByGravity = false
         player.physicsBody?.allowsRotation = false
         player.physicsBody?.isDynamic = true
-        player.physicsBody?.mass = 1
+        player.physicsBody?.mass = 2
         player.physicsBody?.categoryBitMask = PhysicsCategory.player.rawValue
         player.xScale = 0.5
         player.yScale = 0.5
-        player.position.x = -size.width/4
-        cameraNode?.addChild(player)
-        
-    }
-    
-    private func createTerrain() {
-        
+        player.position.x = frame.width/4
+        player.position.y = CGFloat(300)
+        let yConstraint = SKConstraint.positionY(SKRange(lowerLimit: -player.size.height, upperLimit: backgroundNode.size.height - player.size.height))
+        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + player.size.width, upperLimit: backgroundNode.frame.maxX - player.size.width))
+        player.constraints = [xConstraint, yConstraint]
+        addChild(player)
     }
     
     private func createHearts() {
@@ -110,44 +106,33 @@ class GameScene: SKScene {
     }
     
     private func createBackgroundNode() {
+        backgroundNode = BackgroundNode()
+        backgroundNode.configure()
         
-        backgroundNode = SKSpriteNode(imageNamed: "4145")
-        backgroundNode.name = "background"
-        backgroundNode.zPosition = -1
-        backgroundNode.size.height = self.size.height
-        
-        addChild(backgroundNode )
-        
-        groundNode = SKSpriteNode(imageNamed: "ground")
-        groundNode?.name = "ground"
-        groundNode.anchorPoint = CGPoint(x: 0, y: 0)
-        groundNode?.zPosition = 1
-        groundNode?.position.y = -frame.height/2
-        groundNode.position.x = -backgroundNode.size.width/2
-        groundNode?.size.height = frame.height * 0.2
-        groundNode?.physicsBody = SKPhysicsBody(rectangleOf: groundNode.size.applying(CGAffineTransform(scaleX: 1, y: 0.5)), center: CGPoint(x: groundNode.size.width/2, y: groundNode.size.height/2))
-        groundNode.physicsBody?.isDynamic = false
-        
-        backgroundNode.addChild(groundNode!)
-        
-        //newGround
-        
-        let groundNode2 = SKSpriteNode(imageNamed: "ground")
-        groundNode2.name = "ground"
-        groundNode2.anchorPoint = CGPoint(x: 0, y: 0)
-        groundNode2.zPosition = 1
-        groundNode2.position.y = -frame.height/2
-        //groundNode2.position.x = -backgroundNode.size.width/2
-        groundNode2.constraints = [SKConstraint.distance(SKRange(constantValue: groundNode2.size.width + 200), to: groundNode)]
-        groundNode2.size.height = frame.height * 0.2
-        groundNode2.physicsBody = SKPhysicsBody(rectangleOf: groundNode2.size.applying(CGAffineTransform(scaleX: 1, y: 0.5)), center: CGPoint(x: groundNode2.size.width/2, y: groundNode2.size.height/2))
-        groundNode2.physicsBody?.isDynamic = false
-        
-        backgroundNode.addChild(groundNode2)
-        
-        //newGround
+        addChild(backgroundNode)
     }
     
+    private func createTerrain() {
+        createBackgroundNode()
+        addGroundNodes()
+    }
+    
+    private func addGroundNodes() {
+        for i in 1...50 {
+            
+            let groundNode = SKSpriteNode(imageNamed: "ground")
+            groundNode.name = "ground"
+            groundNode.zPosition = 1
+            groundNode.size.width = frame.width/3
+            groundNode.size.height = frame.height/5
+            groundNode.position.x = CGFloat(groundNode.size.width/2) * CGFloat(i)
+            groundNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: groundNode.size.width, height: groundNode.size.height - 20))
+            groundNode.physicsBody?.isDynamic = false
+            
+            addChild(groundNode)
+        }
+    }
+
     private func createControlButtons() {
         
         let buttonsYposition = -(frame.midY - 25)
@@ -187,48 +172,44 @@ class GameScene: SKScene {
     private func setCamera() {
         cameraNode = SKCameraNode()
         camera = cameraNode
-        cameraNode.constraints = [SKConstraint.positionX(SKRange(lowerLimit: -size.width))]
-        let width = backgroundNode.frame.width
-        cameraNode?.position = CGPoint(x: -width/2 + frame.width/2, y: 0)
+        let yConstraint = SKConstraint.positionY(SKRange(lowerLimit: 0, upperLimit: backgroundNode.size.height - frame.height/2 - frame.height/4))
+        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + frame.size.width/2 + frame.size.width/4, upperLimit: backgroundNode.frame.maxX - frame.size.width/2 - frame.size.width/4))
+        cameraNode.setScale(1.25)
+        cameraNode.constraints = [xConstraint, yConstraint]
         addChild(cameraNode!)
-    }
-    
-    private func moveCameraForward() {
-        let moveAction = SKAction.move(by: CGVector(dx: 50, dy: 0), duration: 0.2)
-        let repeatMove = SKAction.repeatForever(moveAction)
-        cameraNode?.run(repeatMove, withKey: "moveForward")
-        player.runForwardAnimation(direction: "forward")
-    }
-    
-    private func moveCameraBackward() {
-        
-        equalizePlayerPositionInCameraNode()
-        let moveAction  = SKAction.move(by: CGVector(dx: -50, dy: 0), duration: 0.2)
-        let repeatMove = SKAction.repeatForever(moveAction)
-        cameraNode?.run(repeatMove)
-        player.runForwardAnimation(direction: "backward")
-    }
-    
-    private func equalizePlayerPositionInCameraNode() {
-        //player.position.x = size.width/2-size.width/4
     }
     
     private func stopCamera() {
         cameraNode?.removeAllActions()
     }
     
+    private func updateCamera() {
+        let position: CGPoint
+        let cameraYposition = CGFloat(player.position.y + player.size.height)
+        if player.movementDirection == .backward {
+            position = CGPoint(x: player.position.x - frame.width/4, y: cameraYposition)
+        } else {
+            position = CGPoint(x: player.position.x + frame.width/4, y: cameraYposition)
+        }
+        let cameraMove = SKAction.move(to: position, duration: 0.2)
+        cameraNode.run(cameraMove)
+    }
+    
     private func handleControlButtonsTaps(sender: String) {
         switch sender {
         case "leftButton":
-            moveCameraBackward()
+            player.run(direction: .backward)
         case "rightButton":
-            moveCameraForward()
+            player.run(direction: .forward)
         case "fireButton":
-            player.throwShuriken(cameraNode: cameraNode)
+            player.throwShuriken()
         case "jumpButton":
             player.jump()
-            //player.physicsBody?.affectedByGravity = true
         default: break
         }
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        updateCamera()
     }
 }

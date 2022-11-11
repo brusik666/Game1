@@ -8,45 +8,50 @@
 import Foundation
 import SpriteKit
 
-class SKPlayerNode: SKSpriteNode {
+class PlayerNode: SKSpriteNode {
     
-    enum FaceDirection {
-        case forward
-        case backward
-    }
-    
-    private var health = 3
-    var faceDirection: FaceDirection = .forward
-    
+    //private var health = 3
+    var movementDirection: MovementDirection = .forward
     func jump() {
-        self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 500))
+        self.physicsBody?.applyImpulse(CGVector(dx: 100, dy: 1000))
     }
     
-    func runForwardAnimation(direction: String) {
+    private func runAnimation(direction: MovementDirection) {
+        movementDirection = direction
         var runningTextures = [SKTexture]()
         for i in 1...9 {
-            if direction == "forward" {
-                faceDirection = .forward
+            if direction == .forward {
                 runningTextures.append(SKTexture(imageNamed: "foxRun\(i)"))
             } else {
-                faceDirection = .backward
                 runningTextures.append(SKTexture(imageNamed: "foxRun\(i)reversed"))
             }
         }
+        
+        
         let runningAnimation = SKAction.animate(with: runningTextures, timePerFrame: 0.05)
         let loop = SKAction.repeatForever(runningAnimation)
         self.removeAction(forKey: "idle")
-        self.run(loop, withKey: "runningLoop")
+        self.run(loop, withKey: "runningAnimationLoop")
     }
     
-    func run() {
-        
+    func run(direction: MovementDirection) {
+        let xVector = direction == .forward ? CGFloat(50): CGFloat(-50)
+        let moveAction = SKAction.move(by: CGVector(dx: xVector, dy: 0), duration: 0.2)
+        let repeatMove = SKAction.repeatForever(moveAction)
+        runAnimation(direction: direction)
+        run(repeatMove, withKey: "run")
+    }
+    
+    func stopRunning() {
+        removeAction(forKey: "run")
+        removeAction(forKey: "runningAnimationLoop")
+        idleAnimation()
     }
     
     func idleAnimation() {
         var idleTextures = [SKTexture]()
         for i in 1...6 {
-            if faceDirection == .forward {
+            if movementDirection == .forward {
                 idleTextures.append(SKTexture(imageNamed: "foxIDLE\(i)"))
             } else {
                 idleTextures.append(SKTexture(imageNamed: "foxIDLE\(i)reversed"))
@@ -57,11 +62,20 @@ class SKPlayerNode: SKSpriteNode {
         self.run(repeatAction, withKey: "idle")
     }
     
-    func throwShuriken(cameraNode: SKCameraNode) {
+    func throwShuriken() {
         let shuriken = createShurikenNode()
-        cameraNode.addChild(shuriken)
         
-        let direction = CGPoint(x: UIScreen.main.bounds.width/2 + shuriken.size.width, y: position.y)
+        let direction: CGPoint
+        if self.movementDirection == .forward {
+            direction = CGPoint(x: parent!.position.x + UIScreen.main.bounds.width * 2 , y: parent!.position.y)
+            shuriken.position = CGPoint(x: parent!.position.x + shuriken.size.width * 3, y: parent!.position.y)
+            
+        } else {
+            direction = CGPoint(x: parent!.position.x - UIScreen.main.bounds.width * 2, y: parent!.position.y)
+            shuriken.position = CGPoint(x: parent!.position.x - shuriken.size.width * 3, y: parent!.position.y)
+        }
+        addChild(shuriken)
+    
         let throwAction = SKAction.move(to: direction, duration: 0.5)
         let throwActionDone = SKAction.removeFromParent()
         let thorwSequence = SKAction.sequence([throwAction, throwActionDone])
@@ -72,15 +86,20 @@ class SKPlayerNode: SKSpriteNode {
     
     private func createShurikenNode() -> SKSpriteNode {
         let shuriken = SKSpriteNode(imageNamed: "shuriken")
-        shuriken.position = CGPoint(x: position.x + size.width/4, y: position.y - 10)
+        shuriken.position = self.position
         shuriken.size.height = size.height/3.5
         shuriken.size.width = size.width/3.5
         shuriken.physicsBody = SKPhysicsBody(circleOfRadius: shuriken.size.width/2)
-        shuriken.physicsBody?.isDynamic = false
-        shuriken.physicsBody?.categoryBitMask = PhysicsCategory.shuriken.rawValue
-        shuriken.physicsBody?.contactTestBitMask = PhysicsCategory.monster.rawValue
+        shuriken.physicsBody?.isDynamic = true
+        //shuriken.physicsBody?.categoryBitMask = PhysicsCategory.shuriken.rawValue
+        //shuriken.physicsBody?.contactTestBitMask = PhysicsCategory.monster.rawValue
         //shuriken.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
         shuriken.physicsBody?.usesPreciseCollisionDetection = true
         return shuriken
     }
+}
+
+enum MovementDirection {
+    case forward
+    case backward
 }

@@ -9,7 +9,7 @@ import UIKit
 
 class StartViewController: UIViewController {
     
-    var isSoundOn: Bool = false
+    var isSoundOn: Bool = true
 
     @IBOutlet weak var switchSoundButton: UIButton!
     
@@ -23,10 +23,10 @@ class StartViewController: UIViewController {
         switch isSoundOn {
         case false:
             isSoundOn = true
-            switchSoundButton.titleLabel?.text = "SOUND OFF"
+            switchSoundButton.setTitle("SOUND ON", for: .normal)
         case true:
             isSoundOn = false
-            switchSoundButton.titleLabel?.text = "SOUND ON"
+            switchSoundButton.setTitle("SOUND OFF", for: .normal)
         }
     }
     @IBSegueAction func startGameSegue(_ coder: NSCoder) -> GameViewController? {

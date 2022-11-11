@@ -26,15 +26,13 @@ class GameViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         navigationItem.hidesBackButton = true
         configureGameScene()
     }
     
     private func configureGameScene() {
         let skView = view as! SKView
-        scene.scaleMode = .resizeFill
+        scene.scaleMode = .aspectFill
         scene.anchorPoint = CGPoint(x: 0.0, y: 0.0)
         
         
@@ -42,6 +40,6 @@ class GameViewController: UIViewController {
         skView.ignoresSiblingOrder = true
         skView.showsFPS = true
         skView.showsNodeCount = true
-        //skView.showsPhysics = true
+        skView.showsPhysics = true
     }
 }

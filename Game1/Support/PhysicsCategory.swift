@@ -11,5 +11,7 @@ enum PhysicsCategory: UInt32 {
     case none = 0
     case player = 1
     case shuriken = 2
-    case monster = 4
+    case monster = 3
+    case hunter = 4
+    case projectile = 5
 }

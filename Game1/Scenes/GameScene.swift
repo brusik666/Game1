@@ -120,7 +120,7 @@ class GameScene: SKScene {
     private func createTerrain() {
         createBackgroundNode()
         addGroundNodes()
-        createEggsNodes()
+        //createEggsNodes()
     }
     
     private func addGroundNodes() {
@@ -138,13 +138,24 @@ class GameScene: SKScene {
                     let upperHighGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width / 3 * 2)
                     upperHighGroundNode.name = "upperHighGround"
                     addChild(upperHighGroundNode)
+                    let hunter = createHunterNode(xPosition: xPosition, yPosition: upperHighGroundNode.position.y + player.size.height/2 )
+                    upperHighGroundNode.addChild(hunter)
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        hunter.move()
+                    }
+                    
                 }
             } else {
                 let highGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height/2, width: width/2)
                 highGroundNode.name = "highGround"
                 addChild(highGroundNode)
-
-                highGroundNode.addChild(createHunterNode(xPosition: xPosition, yPosition: frame.height/1.5 ))
+                let hunter = createHunterNode(xPosition: xPosition - highGroundNode.size.width/2, yPosition: highGroundNode.position.y + player.size.height/2 )
+                highGroundNode.addChild(hunter)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    hunter.move()
+                }
+                
             }
             lastNodePosition += width
         }
@@ -234,7 +245,7 @@ class GameScene: SKScene {
     
     private func createEggsNodes() {
         for highGround in children.filter({$0.name == "highGround" || $0.name == "upperHighGround"}) {
-            let eggsCountOnBlock = highGround.frame.width / player.size.width * 2
+            let eggsCountOnBlock = highGround.frame.width / player.size.width * 4
             for i in 0...Int(eggsCountOnBlock) {
                 let eggNode = SKSpriteNode(imageNamed: "egg")
                 eggNode.name = "egg"
@@ -255,15 +266,11 @@ class GameScene: SKScene {
     private func setCamera() {
         cameraNode = SKCameraNode()
         camera = cameraNode
-        let yConstraint = SKConstraint.positionY(SKRange(lowerLimit: 0, upperLimit: backgroundNode.size.height - frame.height/2 - frame.height/4))
-        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + frame.size.width/2 + frame.size.width/4, upperLimit: backgroundNode.frame.maxX * 2 - frame.size.width/2 - frame.size.width/4))
+        let yConstraint = SKConstraint.positionY(SKRange(lowerLimit: 0 + frame.size.height, upperLimit: backgroundNode.size.height - frame.height))
+        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + frame.size.width, upperLimit: backgroundNode.frame.maxX * 2 - frame.size.width/2 - frame.size.width/4))
         cameraNode.setScale(2)
         cameraNode.constraints = [xConstraint, yConstraint]
-        addChild(cameraNode!)
-    }
-    
-    private func stopCamera() {
-        cameraNode?.removeAllActions()
+        addChild(cameraNode)
     }
     
     private func updateCamera() {
@@ -295,6 +302,15 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         updateCamera()
+        
+        let highGrounds = children.filter({$0.name == "highGround"})
+        highGrounds.forEach { node in
+            guard let hunter = node.childNode(withName: "hunter") as? HunterNode else { return }
+            if player.position.x > hunter.position.x - 200 {
+                //hunter.move()
+            }
+        }
+        
     }
 }
 
@@ -322,7 +338,7 @@ extension GameScene: SKPhysicsContactDelegate {
         
         if ((firstBody.categoryBitMask & PhysicsCategory.shuriken.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.hunter.rawValue != 0)) {
             if let shuriken = firstBody.node as? SKSpriteNode,
-               let hunter = secondBody.node as? SKSpriteNode {
+               let hunter = secondBody.node as? HunterNode {
                 hunter.removeFromParent()
                 shuriken.removeFromParent()
             }

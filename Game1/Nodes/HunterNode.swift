@@ -10,14 +10,13 @@ import SpriteKit
 
 class HunterNode: SKSpriteNode {
     
-    
     func configure() {
         zPosition = 2
+        name = "hunter"
         physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: size.width/2, height: size.height))
         physicsBody?.affectedByGravity = true
         physicsBody?.allowsRotation = false
         physicsBody?.isDynamic = true
-        physicsBody?.mass = 1
         physicsBody?.categoryBitMask = PhysicsCategory.hunter.rawValue
         physicsBody?.contactTestBitMask = PhysicsCategory.shuriken.rawValue
         setScale(0.5)
@@ -28,17 +27,19 @@ class HunterNode: SKSpriteNode {
         for i in 1...6 {
             runningTextures.append(SKTexture(imageNamed: "hunter\(i)"))
         }
-        let runningAnimation = SKAction.animate(with: runningTextures, timePerFrame: 0.05)
+        let runningAnimation = SKAction.animate(with: runningTextures, timePerFrame: 0.25)
         let loop = SKAction.repeatForever(runningAnimation)
         self.run(loop)
     }
     
     func move() {
-        let xVector = CGFloat(-50)
-        let moveAction = SKAction.move(by: CGVector(dx: xVector, dy: 0), duration: 0.2)
-        let repeatMove = SKAction.repeatForever(moveAction)
+        guard let parentNode = parent else { return }
+        let moveAction = SKAction.move(to: CGPoint(x: position.x - parentNode.frame.width, y: position.y), duration: 3)
+        let moveBackAction = SKAction.move(to: CGPoint(x: position.x, y: position.y), duration: 3)
+        let sequence = SKAction.sequence([moveAction, moveBackAction])
+        let forever = SKAction.repeatForever(sequence)
+        run(forever)
         runAnimation()
-        run(repeatMove)
     }
     
     func shot() {
@@ -51,7 +52,7 @@ class HunterNode: SKSpriteNode {
         let throwActionDone = SKAction.removeFromParent()
         let thorwSequence = SKAction.sequence([throwAction, throwActionDone])
         let soundAction = SKAction.playSoundFileNamed("shurikenSwing", waitForCompletion: false)
-        let waitAction = SKAction.wait(forDuration: 0.25)
+        let waitAction = SKAction.wait(forDuration: 3)
         let group = SKAction.group([waitAction ,thorwSequence, soundAction])
         projectile.run(group)
 
@@ -65,7 +66,6 @@ class HunterNode: SKSpriteNode {
         projectile.physicsBody?.affectedByGravity = false
         projectile.physicsBody?.isDynamic = true
         projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile.rawValue
-        projectile.physicsBody?.contactTestBitMask = PhysicsCategory.egg.rawValue
         projectile.position = CGPoint(x: position.x, y: position.y)
         
         return projectile

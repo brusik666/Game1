@@ -19,6 +19,7 @@ class HunterNode: SKSpriteNode {
         physicsBody?.isDynamic = true
         physicsBody?.categoryBitMask = PhysicsCategory.hunter.rawValue
         physicsBody?.contactTestBitMask = PhysicsCategory.shuriken.rawValue
+        //physicsBody?.collisionBitMask = PhysicsCategory.player.rawValue
         setScale(0.5)
     }
     
@@ -46,15 +47,15 @@ class HunterNode: SKSpriteNode {
         let projectile = createProjectile()
         addChild(projectile)
         let direction: CGPoint
-        direction = CGPoint(x: position.x - UIScreen.main.bounds.width * 2, y: position.y)
+        direction = CGPoint(x: position.x - UIScreen.main.bounds.width, y: position.y)
     
         let throwAction = SKAction.move(to: direction, duration: 0.5)
         let throwActionDone = SKAction.removeFromParent()
         let thorwSequence = SKAction.sequence([throwAction, throwActionDone])
-        let soundAction = SKAction.playSoundFileNamed("shurikenSwing", waitForCompletion: false)
-        let waitAction = SKAction.wait(forDuration: 3)
-        let group = SKAction.group([waitAction ,thorwSequence, soundAction])
-        projectile.run(group)
+        let waitAction = SKAction.wait(forDuration: 2)
+        let group = SKAction.group([waitAction ,thorwSequence])
+        let shotForever = SKAction.repeatForever(group)
+        projectile.run(shotForever)
 
     }
     

@@ -18,6 +18,7 @@ class GameScene: SKScene {
     var isSoundOn: Bool = false
     var rightButtonLabel: SKLabelNode!
     var hearts = [SKLabelNode]()
+    var timerLabel: SKLabelNode!
     private var eggsCollected = 0
     private var allEggsCount = 0
     
@@ -30,7 +31,7 @@ class GameScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
-        
+        print("didMove")
         physicsWorld.contactDelegate = self
         self.view?.isMultipleTouchEnabled = true
         if isSoundOn {
@@ -120,7 +121,8 @@ class GameScene: SKScene {
     private func createTerrain() {
         createBackgroundNode()
         addGroundNodes()
-        //createEggsNodes()
+        createEggsNodes()
+        
     }
     
     private func addGroundNodes() {
@@ -138,19 +140,14 @@ class GameScene: SKScene {
                     let upperHighGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width / 3 * 2)
                     upperHighGroundNode.name = "upperHighGround"
                     addChild(upperHighGroundNode)
-                    let hunter = createHunterNode(xPosition: xPosition, yPosition: upperHighGroundNode.position.y + player.size.height/2 )
-                    upperHighGroundNode.addChild(hunter)
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        hunter.move()
-                    }
                     
                 }
             } else {
                 let highGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height/2, width: width/2)
                 highGroundNode.name = "highGround"
                 addChild(highGroundNode)
-                let hunter = createHunterNode(xPosition: xPosition - highGroundNode.size.width/2, yPosition: highGroundNode.position.y + player.size.height/2 )
+                let hunter = createHunterNode(xPosition: xPosition - highGroundNode.size.width/2, yPosition: highGroundNode.position.y)
                 highGroundNode.addChild(hunter)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     hunter.move()
@@ -244,7 +241,7 @@ class GameScene: SKScene {
     }
     
     private func createEggsNodes() {
-        for highGround in children.filter({$0.name == "highGround" || $0.name == "upperHighGround"}) {
+        for highGround in children.filter({$0.name == "upperHighGround"}) {
             let eggsCountOnBlock = highGround.frame.width / player.size.width * 4
             for i in 0...Int(eggsCountOnBlock) {
                 let eggNode = SKSpriteNode(imageNamed: "egg")
@@ -302,15 +299,6 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         updateCamera()
-        
-        let highGrounds = children.filter({$0.name == "highGround"})
-        highGrounds.forEach { node in
-            guard let hunter = node.childNode(withName: "hunter") as? HunterNode else { return }
-            if player.position.x > hunter.position.x - 200 {
-                //hunter.move()
-            }
-        }
-        
     }
 }
 

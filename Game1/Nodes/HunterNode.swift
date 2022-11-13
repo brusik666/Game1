@@ -66,6 +66,7 @@ class HunterNode: SKSpriteNode {
         projectile.physicsBody?.affectedByGravity = false
         projectile.physicsBody?.isDynamic = true
         projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile.rawValue
+        projectile.physicsBody?.contactTestBitMask = PhysicsCategory.egg.rawValue
         projectile.position = CGPoint(x: position.x, y: position.y)
         
         return projectile
@@ -74,7 +75,7 @@ class HunterNode: SKSpriteNode {
 
 struct HunterFabric {
     
-    func createHunterNode(parentNode: SKCameraNode) -> HunterNode {
+    func createHunterNode(parentNode: SKSpriteNode) -> HunterNode {
         let hunter = HunterNode(imageNamed: "hunter1")
         hunter.configure()
         hunter.position = CGPoint(x: parentNode.frame.width/2 + hunter.size.width, y: CGFloat(300))

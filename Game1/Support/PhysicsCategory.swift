@@ -14,4 +14,5 @@ enum PhysicsCategory: UInt32 {
     case monster = 3
     case hunter = 4
     case projectile = 5
+    case egg = 6
 }

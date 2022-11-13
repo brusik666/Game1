@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		EE2FB13C291DB2A10021080D /* HunterNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2FB13B291DB2A10021080D /* HunterNode.swift */; };
 		EE310FE3291C1E7C00013FAB /* PhysicsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE310FE2291C1E7C00013FAB /* PhysicsCategory.swift */; };
+		EE336F27291FD4C9003DD138 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EE336F25291FD4C9003DD138 /* Assets.xcassets */; };
 		EE33A20A291D897A005AEAE1 /* shurikenSwing.wav in Resources */ = {isa = PBXBuildFile; fileRef = EE33A209291D897A005AEAE1 /* shurikenSwing.wav */; };
 		EE52889A2915176800B41CAF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE5288992915176800B41CAF /* AppDelegate.swift */; };
 		EE52889C2915176800B41CAF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE52889B2915176800B41CAF /* SceneDelegate.swift */; };
@@ -26,6 +27,7 @@
 /* Begin PBXFileReference section */
 		EE2FB13B291DB2A10021080D /* HunterNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HunterNode.swift; sourceTree = "<group>"; };
 		EE310FE2291C1E7C00013FAB /* PhysicsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsCategory.swift; sourceTree = "<group>"; };
+		EE336F25291FD4C9003DD138 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EE33A209291D897A005AEAE1 /* shurikenSwing.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = shurikenSwing.wav; sourceTree = "<group>"; };
 		EE5288962915176800B41CAF /* Game1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Game1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE5288992915176800B41CAF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				EE5288AD29151C5300B41CAF /* GameScene.swift */,
+				EE336F25291FD4C9003DD138 /* Assets.xcassets */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -192,6 +195,7 @@
 				EE33A20A291D897A005AEAE1 /* shurikenSwing.wav in Resources */,
 				EE5288A62915176D00B41CAF /* LaunchScreen.storyboard in Resources */,
 				EE9F6BCD291B265C00566F0C /* mainTheme.mp3 in Resources */,
+				EE336F27291FD4C9003DD138 /* Assets.xcassets in Resources */,
 				EE5288A32915176D00B41CAF /* Assets.xcassets in Resources */,
 				EE5288A12915176800B41CAF /* Main.storyboard in Resources */,
 			);

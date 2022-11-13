@@ -28,6 +28,7 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         
+        physicsWorld.contactDelegate = self
         self.view?.isMultipleTouchEnabled = true
         if isSoundOn {
             //let backGroundMusic = SKAudioNode(fileNamed: "mainTheme")
@@ -68,7 +69,6 @@ class GameScene: SKScene {
     
     private func setupPlayerNode() {
         player.zPosition = 2
-        //player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size)
         player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width/2, height: player.size.height))
         player.physicsBody?.affectedByGravity = false
         player.physicsBody?.allowsRotation = false
@@ -80,7 +80,7 @@ class GameScene: SKScene {
         player.position.x = frame.width/4
         player.position.y = CGFloat(300)
         let yConstraint = SKConstraint.positionY(SKRange(lowerLimit: -player.size.height, upperLimit: backgroundNode.size.height - player.size.height))
-        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + player.size.width, upperLimit: backgroundNode.frame.maxX - player.size.width))
+        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + player.size.width, upperLimit: backgroundNode.frame.maxX * 2 - player.size.width))
         player.constraints = [xConstraint, yConstraint]
         addChild(player)
     }
@@ -115,22 +115,56 @@ class GameScene: SKScene {
     private func createTerrain() {
         createBackgroundNode()
         addGroundNodes()
+        //createEggsNodes()
     }
     
     private func addGroundNodes() {
-        for i in 1...50 {
+        let width = frame.width
+        guard let levelLenght = childNode(withName: "background")?.frame.size.width else { return }
+        let groundNodesCount = Int(levelLenght / width)
+        var lastNodePosition = CGFloat(0)
+        var xPosition: CGFloat { lastNodePosition + width/2 }
+        for i in 1...groundNodesCount {
             
-            let groundNode = SKSpriteNode(imageNamed: "ground")
-            groundNode.name = "ground"
-            groundNode.zPosition = 1
-            groundNode.size.width = frame.width/3
-            groundNode.size.height = frame.height/5
-            groundNode.position.x = CGFloat(groundNode.size.width/2) * CGFloat(i)
-            groundNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: groundNode.size.width, height: groundNode.size.height - 20))
-            groundNode.physicsBody?.isDynamic = false
-            
-            addChild(groundNode)
+            if i % 2 != 0 {
+                let groundNode = createGroundNode(xPosition: xPosition, width: width)
+                addChild(groundNode)
+                let upperHightGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width)
+                addChild(upperHightGroundNode)
+            } else {
+                let highGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height/2, width: width/2)
+                highGroundNode.name = "highGround"
+                addChild(highGroundNode)
+            }
+            //let hasd = HunterFabric().createHunterNode(parentNode: groundNode)
+            //addChild(groundNode)
+            lastNodePosition += width
         }
+    }
+    
+    private func createGroundNode(xPosition: CGFloat, width: CGFloat) -> SKSpriteNode {
+        let groundNode = SKSpriteNode(imageNamed: "ground")
+        groundNode.name = "ground"
+        groundNode.zPosition = 1
+        groundNode.size.width = width
+        groundNode.size.height = frame.height/5
+        groundNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: width, height: groundNode.size.height - 20))
+        groundNode.physicsBody?.isDynamic = false
+        groundNode.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
+        groundNode.position.x = xPosition
+        return groundNode
+    }
+    
+    private func createHighGroundNode(xPosition: CGFloat, yPosition: CGFloat, width: CGFloat) -> SKSpriteNode {
+        let highGroundNode = SKSpriteNode(imageNamed: "highGround")
+        highGroundNode.zPosition = 1
+        highGroundNode.size.width = width
+        highGroundNode.size.height = frame.height/10
+        highGroundNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: width/2, height: highGroundNode.size.height - 20))
+        highGroundNode.physicsBody?.isDynamic = false
+        highGroundNode.position.x = xPosition
+        highGroundNode.position.y = yPosition
+        return highGroundNode
     }
 
     private func createControlButtons() {
@@ -169,12 +203,27 @@ class GameScene: SKScene {
         cameraNode?.addChild(fireButtonLabel)
     }
     
+    private func createEggsNodes() {
+        for ground in children.filter({$0.name == "highGround"}) {
+            let eggNode = SKSpriteNode(imageNamed: "egg")
+            eggNode.size = CGSize(width: player.size.width/4, height: player.size.height/4)
+            eggNode.physicsBody = SKPhysicsBody(texture: eggNode.texture!, size: eggNode.size)
+            eggNode.physicsBody?.affectedByGravity = false
+            eggNode.physicsBody?.isDynamic = true
+            eggNode.physicsBody?.categoryBitMask = PhysicsCategory.egg.rawValue
+            eggNode.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
+            eggNode.physicsBody?.contactTestBitMask = PhysicsCategory.projectile.rawValue
+            eggNode.position = ground.position
+            ground.addChild(eggNode)
+        }
+    }
+    
     private func setCamera() {
         cameraNode = SKCameraNode()
         camera = cameraNode
         let yConstraint = SKConstraint.positionY(SKRange(lowerLimit: 0, upperLimit: backgroundNode.size.height - frame.height/2 - frame.height/4))
-        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + frame.size.width/2 + frame.size.width/4, upperLimit: backgroundNode.frame.maxX - frame.size.width/2 - frame.size.width/4))
-        cameraNode.setScale(1.25)
+        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + frame.size.width/2 + frame.size.width/4, upperLimit: backgroundNode.frame.maxX * 2 - frame.size.width/2 - frame.size.width/4))
+        cameraNode.setScale(2)
         cameraNode.constraints = [xConstraint, yConstraint]
         addChild(cameraNode!)
     }
@@ -185,7 +234,7 @@ class GameScene: SKScene {
     
     private func updateCamera() {
         let position: CGPoint
-        let cameraYposition = CGFloat(player.position.y + player.size.height)
+        let cameraYposition = CGFloat(player.position.y + player.size.height/2)
         if player.movementDirection == .backward {
             position = CGPoint(x: player.position.x - frame.width/4, y: cameraYposition)
         } else {
@@ -205,11 +254,34 @@ class GameScene: SKScene {
             player.throwShuriken()
         case "jumpButton":
             player.jump()
+            
         default: break
         }
     }
     
     override func update(_ currentTime: TimeInterval) {
         updateCamera()
+    }
+}
+
+extension GameScene: SKPhysicsContactDelegate {
+    func didBegin(_ contact: SKPhysicsContact) {
+        var firstBody: SKPhysicsBody
+        var secondBody: SKPhysicsBody
+        if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
+          firstBody = contact.bodyA
+          secondBody = contact.bodyB
+        } else {
+          firstBody = contact.bodyB
+          secondBody = contact.bodyA
+        }
+        
+        if ((firstBody.categoryBitMask & PhysicsCategory.egg.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.projectile.rawValue != 0)) {
+          if let egg = firstBody.node as? SKSpriteNode,
+             let projectile = secondBody.node as? SKSpriteNode {
+              egg.removeFromParent()
+              projectile.removeFromParent()
+          }
+        }
     }
 }

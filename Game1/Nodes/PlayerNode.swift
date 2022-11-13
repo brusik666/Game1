@@ -13,7 +13,13 @@ class PlayerNode: SKSpriteNode {
     //private var health = 3
     var movementDirection: MovementDirection = .forward
     func jump() {
-        self.physicsBody?.applyImpulse(CGVector(dx: 100, dy: 1000))
+        switch movementDirection {
+        case .forward:
+            self.physicsBody?.applyImpulse(CGVector(dx: 100, dy: 1000))
+        case .backward:
+            self.physicsBody?.applyImpulse(CGVector(dx: -100, dy: 1000))
+        }
+        
     }
     
     private func runAnimation(direction: MovementDirection) {
@@ -67,11 +73,11 @@ class PlayerNode: SKSpriteNode {
         
         let direction: CGPoint
         if self.movementDirection == .forward {
-            direction = CGPoint(x: parent!.position.x + UIScreen.main.bounds.width * 2 , y: parent!.position.y)
+            direction = CGPoint(x: parent!.position.x + UIScreen.main.bounds.width * 3 , y: parent!.position.y)
             shuriken.position = CGPoint(x: parent!.position.x + shuriken.size.width * 3, y: parent!.position.y)
             
         } else {
-            direction = CGPoint(x: parent!.position.x - UIScreen.main.bounds.width * 2, y: parent!.position.y)
+            direction = CGPoint(x: parent!.position.x - UIScreen.main.bounds.width * 3, y: parent!.position.y)
             shuriken.position = CGPoint(x: parent!.position.x - shuriken.size.width * 3, y: parent!.position.y)
         }
         addChild(shuriken)
@@ -91,9 +97,9 @@ class PlayerNode: SKSpriteNode {
         shuriken.size.width = size.width/3.5
         shuriken.physicsBody = SKPhysicsBody(circleOfRadius: shuriken.size.width/2)
         shuriken.physicsBody?.isDynamic = true
-        //shuriken.physicsBody?.categoryBitMask = PhysicsCategory.shuriken.rawValue
-        //shuriken.physicsBody?.contactTestBitMask = PhysicsCategory.monster.rawValue
-        //shuriken.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
+        shuriken.physicsBody?.categoryBitMask = PhysicsCategory.shuriken.rawValue
+        shuriken.physicsBody?.contactTestBitMask = PhysicsCategory.egg.rawValue
+        shuriken.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
         shuriken.physicsBody?.usesPreciseCollisionDetection = true
         return shuriken
     }

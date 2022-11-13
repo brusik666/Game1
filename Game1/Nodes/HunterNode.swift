@@ -11,7 +11,7 @@ import SpriteKit
 class HunterNode: SKSpriteNode {
     
     
-    fileprivate func configure() {
+    func configure() {
         zPosition = 2
         physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: size.width/2, height: size.height))
         physicsBody?.affectedByGravity = true
@@ -19,9 +19,8 @@ class HunterNode: SKSpriteNode {
         physicsBody?.isDynamic = true
         physicsBody?.mass = 1
         physicsBody?.categoryBitMask = PhysicsCategory.hunter.rawValue
+        physicsBody?.contactTestBitMask = PhysicsCategory.shuriken.rawValue
         setScale(0.5)
-        //hunter.xScale = 0.5
-        //hunter.yScale = 0.5
     }
     
     private func runAnimation() {
@@ -73,16 +72,3 @@ class HunterNode: SKSpriteNode {
     }
 }
 
-struct HunterFabric {
-    
-    func createHunterNode(parentNode: SKSpriteNode) -> HunterNode {
-        let hunter = HunterNode(imageNamed: "hunter1")
-        hunter.configure()
-        hunter.position = CGPoint(x: parentNode.frame.width/2 + hunter.size.width, y: CGFloat(300))
-        parentNode.addChild(hunter)
-        
-        return hunter
-    }
-    
-    
-}

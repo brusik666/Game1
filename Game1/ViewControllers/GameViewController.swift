@@ -35,11 +35,11 @@ class GameViewController: UIViewController {
         scene.scaleMode = .aspectFill
         scene.anchorPoint = CGPoint(x: 0.0, y: 0.0)
         
-        
-        skView.presentScene(scene)
         skView.ignoresSiblingOrder = true
         skView.showsFPS = true
         skView.showsNodeCount = true
         skView.showsPhysics = true
+        skView.presentScene(scene)
+        
     }
 }

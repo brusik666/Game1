@@ -13,10 +13,13 @@ class GameScene: SKScene {
     var groundNode: SKSpriteNode!
     var backgroundNode: BackgroundNode!
     var cameraNode: SKCameraNode!
+    var eggsRemainLabel: SKLabelNode!
     let player = PlayerNode(imageNamed: "foxIDLE1")
     var isSoundOn: Bool = false
     var rightButtonLabel: SKLabelNode!
     var hearts = [SKLabelNode]()
+    private var eggsCollected = 0
+    private var allEggsCount = 0
     
     override init(size: CGSize) {
         super.init(size: size)
@@ -39,6 +42,7 @@ class GameScene: SKScene {
         setCamera()
         createControlButtons()
         createHearts()
+        createEggsRemainLabel()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.player.physicsBody?.affectedByGravity = true
             self.player.idleAnimation()
@@ -75,6 +79,7 @@ class GameScene: SKScene {
         player.physicsBody?.isDynamic = true
         player.physicsBody?.mass = 2
         player.physicsBody?.categoryBitMask = PhysicsCategory.player.rawValue
+        player.physicsBody?.contactTestBitMask = PhysicsCategory.egg.rawValue
         player.xScale = 0.5
         player.yScale = 0.5
         player.position.x = frame.width/4
@@ -115,7 +120,7 @@ class GameScene: SKScene {
     private func createTerrain() {
         createBackgroundNode()
         addGroundNodes()
-        //createEggsNodes()
+        createEggsNodes()
     }
     
     private func addGroundNodes() {
@@ -129,15 +134,18 @@ class GameScene: SKScene {
             if i % 2 != 0 {
                 let groundNode = createGroundNode(xPosition: xPosition, width: width)
                 addChild(groundNode)
-                let upperHightGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width)
-                addChild(upperHightGroundNode)
+                if i != 1 {
+                    let upperHighGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width / 3 * 2)
+                    upperHighGroundNode.name = "upperHighGround"
+                    addChild(upperHighGroundNode)
+                }
             } else {
                 let highGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height/2, width: width/2)
                 highGroundNode.name = "highGround"
                 addChild(highGroundNode)
+
+                highGroundNode.addChild(createHunterNode(xPosition: xPosition, yPosition: frame.height/1.5 ))
             }
-            //let hasd = HunterFabric().createHunterNode(parentNode: groundNode)
-            //addChild(groundNode)
             lastNodePosition += width
         }
     }
@@ -160,11 +168,20 @@ class GameScene: SKScene {
         highGroundNode.zPosition = 1
         highGroundNode.size.width = width
         highGroundNode.size.height = frame.height/10
-        highGroundNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: width/2, height: highGroundNode.size.height - 20))
+        highGroundNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: width, height: highGroundNode.size.height))
         highGroundNode.physicsBody?.isDynamic = false
         highGroundNode.position.x = xPosition
         highGroundNode.position.y = yPosition
         return highGroundNode
+    }
+    
+    private func createHunterNode(xPosition: CGFloat, yPosition: CGFloat) -> HunterNode {
+        let hunter = HunterNode(imageNamed: "hunter1")
+        hunter.size = player.size
+        hunter.configure()
+        hunter.position = CGPoint(x: xPosition, y: yPosition)
+        
+        return hunter
     }
 
     private func createControlButtons() {
@@ -203,18 +220,35 @@ class GameScene: SKScene {
         cameraNode?.addChild(fireButtonLabel)
     }
     
+    private func createEggsRemainLabel() {
+        
+        eggsRemainLabel = SKLabelNode(text: "0/\(allEggsCount)")
+        eggsRemainLabel.position = CGPoint(x: -size.width/2 + 75, y: size.height/2 - 80)
+        eggsRemainLabel.fontColor = SKColor.black
+        eggsRemainLabel.fontSize = 25
+        eggsRemainLabel.zPosition = 3
+        eggsRemainLabel.name = "eggsRemainLabel"
+        
+        cameraNode?.addChild(eggsRemainLabel)
+    }
+    
     private func createEggsNodes() {
-        for ground in children.filter({$0.name == "highGround"}) {
-            let eggNode = SKSpriteNode(imageNamed: "egg")
-            eggNode.size = CGSize(width: player.size.width/4, height: player.size.height/4)
-            eggNode.physicsBody = SKPhysicsBody(texture: eggNode.texture!, size: eggNode.size)
-            eggNode.physicsBody?.affectedByGravity = false
-            eggNode.physicsBody?.isDynamic = true
-            eggNode.physicsBody?.categoryBitMask = PhysicsCategory.egg.rawValue
-            eggNode.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
-            eggNode.physicsBody?.contactTestBitMask = PhysicsCategory.projectile.rawValue
-            eggNode.position = ground.position
-            ground.addChild(eggNode)
+        for highGround in children.filter({$0.name == "highGround" || $0.name == "upperHighGround"}) {
+            let eggsCountOnBlock = highGround.frame.width / player.size.width * 2
+            for i in 0...Int(eggsCountOnBlock) {
+                let eggNode = SKSpriteNode(imageNamed: "egg")
+                eggNode.name = "egg"
+                eggNode.size = CGSize(width: player.size.width/4, height: player.size.height/4)
+                eggNode.physicsBody = SKPhysicsBody(texture: eggNode.texture!, size: eggNode.size)
+                eggNode.physicsBody?.affectedByGravity = false
+                eggNode.physicsBody?.isDynamic = true
+                eggNode.physicsBody?.categoryBitMask = PhysicsCategory.egg.rawValue
+                eggNode.physicsBody?.contactTestBitMask = PhysicsCategory.player.rawValue
+                eggNode.position.y = highGround.position.y + player.size.height
+                eggNode.position.x = highGround.frame.minX + CGFloat(i) * eggNode.size.width
+                allEggsCount += 1
+                addChild(eggNode)
+            }
         }
     }
     
@@ -276,12 +310,22 @@ extension GameScene: SKPhysicsContactDelegate {
           secondBody = contact.bodyA
         }
         
-        if ((firstBody.categoryBitMask & PhysicsCategory.egg.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.projectile.rawValue != 0)) {
-          if let egg = firstBody.node as? SKSpriteNode,
-             let projectile = secondBody.node as? SKSpriteNode {
-              egg.removeFromParent()
-              projectile.removeFromParent()
+        if ((firstBody.categoryBitMask & PhysicsCategory.player.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.egg.rawValue != 0)) {
+          if let player = firstBody.node as? SKSpriteNode,
+             let node = secondBody.node as? SKSpriteNode, node.name == "egg" {
+              let eggLabel = cameraNode.childNode(withName: "eggsRemainLabel") as? SKLabelNode
+              eggsCollected += 1
+              eggLabel?.text = "\(eggsCollected)/\(allEggsCount)"
+              node.removeFromParent()
           }
+        }
+        
+        if ((firstBody.categoryBitMask & PhysicsCategory.shuriken.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.hunter.rawValue != 0)) {
+            if let shuriken = firstBody.node as? SKSpriteNode,
+               let hunter = secondBody.node as? SKSpriteNode {
+                hunter.removeFromParent()
+                shuriken.removeFromParent()
+            }
         }
     }
 }

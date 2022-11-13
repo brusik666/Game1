@@ -98,7 +98,6 @@ class PlayerNode: SKSpriteNode {
         shuriken.physicsBody = SKPhysicsBody(circleOfRadius: shuriken.size.width/2)
         shuriken.physicsBody?.isDynamic = true
         shuriken.physicsBody?.categoryBitMask = PhysicsCategory.shuriken.rawValue
-        shuriken.physicsBody?.contactTestBitMask = PhysicsCategory.egg.rawValue
         shuriken.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
         shuriken.physicsBody?.usesPreciseCollisionDetection = true
         return shuriken

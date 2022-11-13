@@ -121,8 +121,6 @@ class GameScene: SKScene {
     private func createTerrain() {
         createBackgroundNode()
         addGroundNodes()
-        createEggsNodes()
-        
     }
     
     private func addGroundNodes() {
@@ -140,8 +138,7 @@ class GameScene: SKScene {
                     let upperHighGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width / 3 * 2)
                     upperHighGroundNode.name = "upperHighGround"
                     addChild(upperHighGroundNode)
-                    
-                    
+                    createEggsNodes(parentNode: upperHighGroundNode)
                 }
             } else {
                 let highGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height/2, width: width/2)
@@ -240,23 +237,21 @@ class GameScene: SKScene {
         cameraNode?.addChild(eggsRemainLabel)
     }
     
-    private func createEggsNodes() {
-        for highGround in children.filter({$0.name == "upperHighGround"}) {
-            let eggsCountOnBlock = highGround.frame.width / player.size.width * 4
-            for i in 0...Int(eggsCountOnBlock) {
-                let eggNode = SKSpriteNode(imageNamed: "egg")
-                eggNode.name = "egg"
-                eggNode.size = CGSize(width: player.size.width/4, height: player.size.height/4)
-                eggNode.physicsBody = SKPhysicsBody(texture: eggNode.texture!, size: eggNode.size)
-                eggNode.physicsBody?.affectedByGravity = false
-                eggNode.physicsBody?.isDynamic = true
-                eggNode.physicsBody?.categoryBitMask = PhysicsCategory.egg.rawValue
-                eggNode.physicsBody?.contactTestBitMask = PhysicsCategory.player.rawValue
-                eggNode.position.y = highGround.position.y + player.size.height
-                eggNode.position.x = highGround.frame.minX + CGFloat(i) * eggNode.size.width
-                allEggsCount += 1
-                addChild(eggNode)
-            }
+    private func createEggsNodes(parentNode: SKSpriteNode) {
+        let eggsCountOnBlock = parentNode.frame.width / player.size.width * 4
+        for i in 0...Int(eggsCountOnBlock) {
+            let eggNode = SKSpriteNode(imageNamed: "egg")
+            eggNode.name = "egg"
+            eggNode.size = CGSize(width: player.size.width/4, height: player.size.height/4)
+            eggNode.physicsBody = SKPhysicsBody(texture: eggNode.texture!, size: eggNode.size)
+            eggNode.physicsBody?.affectedByGravity = false
+            eggNode.physicsBody?.isDynamic = true
+            eggNode.physicsBody?.categoryBitMask = PhysicsCategory.egg.rawValue
+            eggNode.physicsBody?.contactTestBitMask = PhysicsCategory.player.rawValue
+            eggNode.position.y = parentNode.position.y + player.size.height
+            eggNode.position.x = parentNode.frame.minX + CGFloat(i) * eggNode.size.width
+            allEggsCount += 1
+            addChild(eggNode)
         }
     }
     

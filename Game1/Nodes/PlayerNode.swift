@@ -11,6 +11,7 @@ import SpriteKit
 class PlayerNode: SKSpriteNode {
     
     //private var health = 3
+    
     var movementDirection: MovementDirection = .forward
     func jump() {
         switch movementDirection {
@@ -98,7 +99,6 @@ class PlayerNode: SKSpriteNode {
         shuriken.physicsBody = SKPhysicsBody(circleOfRadius: shuriken.size.width/2)
         shuriken.physicsBody?.isDynamic = true
         shuriken.physicsBody?.categoryBitMask = PhysicsCategory.shuriken.rawValue
-        shuriken.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
         shuriken.physicsBody?.usesPreciseCollisionDetection = true
         return shuriken
     }

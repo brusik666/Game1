@@ -78,9 +78,9 @@ class GameScene: SKScene {
         player.physicsBody?.affectedByGravity = false
         player.physicsBody?.allowsRotation = false
         player.physicsBody?.isDynamic = true
-        player.physicsBody?.mass = 2
         player.physicsBody?.categoryBitMask = PhysicsCategory.player.rawValue
         player.physicsBody?.contactTestBitMask = PhysicsCategory.egg.rawValue
+        player.physicsBody?.usesPreciseCollisionDetection = true
         player.xScale = 0.5
         player.yScale = 0.5
         player.position.x = frame.width/4
@@ -243,11 +243,13 @@ class GameScene: SKScene {
             let eggNode = SKSpriteNode(imageNamed: "egg")
             eggNode.name = "egg"
             eggNode.size = CGSize(width: player.size.width/4, height: player.size.height/4)
-            eggNode.physicsBody = SKPhysicsBody(texture: eggNode.texture!, size: eggNode.size)
+            eggNode.physicsBody = SKPhysicsBody(circleOfRadius: eggNode.size.width/2)
             eggNode.physicsBody?.affectedByGravity = false
             eggNode.physicsBody?.isDynamic = true
+            eggNode.physicsBody?.mass = 0.01
             eggNode.physicsBody?.categoryBitMask = PhysicsCategory.egg.rawValue
             eggNode.physicsBody?.contactTestBitMask = PhysicsCategory.player.rawValue
+            eggNode.physicsBody?.collisionBitMask = 0
             eggNode.position.y = parentNode.position.y + player.size.height
             eggNode.position.x = parentNode.frame.minX + CGFloat(i) * eggNode.size.width
             allEggsCount += 1
@@ -312,10 +314,10 @@ extension GameScene: SKPhysicsContactDelegate {
         if ((firstBody.categoryBitMask & PhysicsCategory.player.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.egg.rawValue != 0)) {
           if let player = firstBody.node as? SKSpriteNode,
              let node = secondBody.node as? SKSpriteNode, node.name == "egg" {
+              node.removeFromParent()
               let eggLabel = cameraNode.childNode(withName: "eggsRemainLabel") as? SKLabelNode
               eggsCollected += 1
               eggLabel?.text = "\(eggsCollected)/\(allEggsCount)"
-              node.removeFromParent()
           }
         }
         

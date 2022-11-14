@@ -26,8 +26,9 @@ class BackgroundNode: SKSpriteNode {
             
             addChild(backgroundPartNode)
         }
-        self.size.height = (children.first?.frame.height)!
-        self.size.width = CGFloat(children.count) * (children.first?.frame.width)!
+        guard let child = children.first else { return }
+        self.size.height = child.frame.height
+        self.size.width = CGFloat(children.count) * child.frame.width
     }
 }
 

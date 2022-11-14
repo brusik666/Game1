@@ -19,7 +19,6 @@ class HunterNode: SKSpriteNode {
         physicsBody?.isDynamic = true
         physicsBody?.categoryBitMask = PhysicsCategory.hunter.rawValue
         physicsBody?.contactTestBitMask = PhysicsCategory.shuriken.rawValue
-        //physicsBody?.collisionBitMask = PhysicsCategory.player.rawValue
         setScale(0.5)
     }
     
@@ -58,7 +57,6 @@ class HunterNode: SKSpriteNode {
         projectile.run(shotForever)
 
     }
-    
     
     private func createProjectile() -> SKShapeNode {
         let projectile = SKShapeNode(circleOfRadius: 30)

@@ -337,7 +337,10 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         updateCamera()
-        
+        if player.position.y < position.y {
+            hearts.forEach({$0.removeFromParent()})
+            gameOver(win: false)
+        }
     }
 }
 

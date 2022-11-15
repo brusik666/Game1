@@ -13,20 +13,30 @@ import AVFoundation
 class GameScene: SKScene {
     
     weak var gameOverDelegate: GameOverDelegate?
-    var groundNode: SKSpriteNode!
     var backgroundNode: BackgroundNode!
     var cameraNode: SKCameraNode!
     var eggsRemainLabel: SKLabelNode!
     let player = PlayerNode(imageNamed: "foxIDLE1")
     var isSoundOn: Bool = false
     var rightButtonLabel: SKLabelNode!
+    var timerLabel: SKLabelNode!
     private var hearts = [SKSpriteNode]() {
         didSet {
             if hearts.isEmpty { gameOver(win: false) }
         }
     }
-    var hunters = [HunterNode]()
-    var timerLabel: SKLabelNode!
+    
+    let formatter = DateComponentsFormatter()
+    var timerSeconds: Int = 0 {
+        didSet {
+            formatter.allowedUnits = [.minute, .second]
+            formatter.unitsStyle = .positional
+
+            let formattedString = formatter.string(from: TimeInterval(timerSeconds))!
+            timerLabel.text = "Time - \(formattedString)"
+            print(formattedString)
+        }
+    }
     private var soundFXPlayer: AVAudioPlayer? = nil
     
     private var eggsCollected = 0 {
@@ -56,6 +66,8 @@ class GameScene: SKScene {
         createControlButtons()
         createHearts()
         createEggsRemainLabel()
+        setupTimerLabel()
+        setupTimerActions()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.player.physicsBody?.affectedByGravity = true
             self.player.idleAnimation()
@@ -83,6 +95,17 @@ class GameScene: SKScene {
         default: return
         }
     }
+    
+    private func setupTimerActions() {
+        let addOneSecToTimerAction = SKAction.run { [unowned self] in
+            self.timerSeconds += 1
+        }
+        let waitForOneSecAction = SKAction.wait(forDuration: 1)
+        let sequecne = SKAction.sequence([waitForOneSecAction, addOneSecToTimerAction])
+        let foreverSequence = SKAction.repeatForever(sequecne)
+        run(foreverSequence)
+    }
+    
     
     private func setupPlayerNode() {
         player.zPosition = 2
@@ -148,10 +171,14 @@ class GameScene: SKScene {
             if i % 2 != 0 {
                 let groundNode = createGroundNode(xPosition: xPosition, width: width)
                 addChild(groundNode)
-                let upperHighGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width / 3 * 2)
-                upperHighGroundNode.name = "upperHighGround"
-                addChild(upperHighGroundNode)
-                createEggsNodes(parentNode: upperHighGroundNode)
+                
+                if i != 1 {
+                    let upperHighGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width / 3 * 2)
+                    upperHighGroundNode.name = "upperHighGround"
+                    addChild(upperHighGroundNode)
+                    createEggsNodes(parentNode: upperHighGroundNode)
+                }
+                
             } else {
                 let highGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height/2, width: width/2)
                 highGroundNode.name = "highGround"
@@ -257,6 +284,16 @@ class GameScene: SKScene {
         cameraNode?.addChild(eggsRemainLabel)
     }
     
+    private func setupTimerLabel() {
+        timerLabel = SKLabelNode(text: "Time")
+        timerLabel.position = CGPoint(x: -size.width/2 + 75, y: size.height/2 - 120)
+        timerLabel.fontColor = SKColor.black
+        timerLabel.fontSize = 25
+        timerLabel.zPosition = 3
+        
+        cameraNode.addChild(timerLabel)
+    }
+    
     private func createEggsNodes(parentNode: SKSpriteNode) {
         let eggsCountOnBlock = parentNode.frame.width / player.size.width * 4
         for i in 0...Int(eggsCountOnBlock) {
@@ -329,14 +366,16 @@ class GameScene: SKScene {
             player.throwShuriken()
             playSoundFile(name: "shurikenSwing")
         case "jumpButton":
-            playSoundFile(name: "jump")
+            
             player.jump()
+            playSoundFile(name: "jump")
             
         default: break
         }
     }
     
     override func update(_ currentTime: TimeInterval) {
+
         updateCamera()
         if player.position.y < position.y {
             hearts.forEach({$0.removeFromParent()})

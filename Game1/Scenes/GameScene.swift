@@ -343,9 +343,7 @@ class GameScene: SKScene {
         do {
             soundFXPlayer = try AVAudioPlayer(contentsOf: soundUrl)
             soundFXPlayer?.volume = 0.5
-            if player.isOnGround {
-                soundFXPlayer!.play()
-            }
+            soundFXPlayer!.play()
         } catch {
             print(error)
         }
@@ -366,10 +364,10 @@ class GameScene: SKScene {
             player.throwShuriken()
             playSoundFile(name: "shurikenSwing")
         case "jumpButton":
-            
+            if player.isOnGround {
+                playSoundFile(name: "jump")
+            }
             player.jump()
-            playSoundFile(name: "jump")
-            
         default: break
         }
     }

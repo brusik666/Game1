@@ -31,6 +31,7 @@ class StartViewController: UIViewController {
     }
     @IBSegueAction func startGameSegue(_ coder: NSCoder) -> GameViewController? {
         return GameViewController(coder: coder, sounds: isSoundOn)
+        
     }
 }
 

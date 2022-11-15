@@ -12,6 +12,7 @@ import AVFoundation
 
 class GameScene: SKScene {
     
+    weak var gameOverDelegate: GameOverDelegate?
     var groundNode: SKSpriteNode!
     var backgroundNode: BackgroundNode!
     var cameraNode: SKCameraNode!
@@ -19,7 +20,11 @@ class GameScene: SKScene {
     let player = PlayerNode(imageNamed: "foxIDLE1")
     var isSoundOn: Bool = false
     var rightButtonLabel: SKLabelNode!
-    var hearts = [SKSpriteNode]()
+    private var hearts = [SKSpriteNode]() {
+        didSet {
+            if hearts.isEmpty { gameOver(win: false) }
+        }
+    }
     var hunters = [HunterNode]()
     var timerLabel: SKLabelNode!
     private var soundFXPlayer: AVAudioPlayer? = nil
@@ -27,7 +32,7 @@ class GameScene: SKScene {
     private var eggsCollected = 0 {
         didSet {
             if eggsCollected == allEggsCount {
-                
+                gameOver(win: true)
             }
         }
     }
@@ -294,10 +299,11 @@ class GameScene: SKScene {
     }
     
     private func playSoundFile(name: String) {
-        guard isSoundOn else { return }
-        let soundUrl = Bundle.main.url(forResource: name, withExtension: "mp3")
+        guard isSoundOn,
+        let soundUrl = Bundle.main.url(forResource: name, withExtension: "mp3") else { return }
+        
         do {
-            soundFXPlayer = try AVAudioPlayer(contentsOf: soundUrl!)
+            soundFXPlayer = try AVAudioPlayer(contentsOf: soundUrl)
             soundFXPlayer?.volume = 0.5
             if player.isOnGround {
                 soundFXPlayer!.play()
@@ -305,6 +311,11 @@ class GameScene: SKScene {
         } catch {
             print(error)
         }
+    }
+    
+    private func gameOver(win: Bool) {
+        self.isPaused = true
+        gameOverDelegate?.gameOver(winCondition: win)
     }
     
     private func handleControlButtonsTaps(sender: String) {
@@ -360,12 +371,15 @@ extension GameScene: SKPhysicsContactDelegate {
         }
         
         if ((firstBody.categoryBitMask & PhysicsCategory.player.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.ground.rawValue != 0)) {
+            
             player.isOnGround = true
             player.speed = 1
         }
         
-        if ((firstBody.categoryBitMask & PhysicsCategory.shuriken.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.hunter.rawValue != 0)) {
+        if ((firstBody.categoryBitMask & PhysicsCategory.player.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.hunter.rawValue != 0)) {
             
+            let heartNode = hearts.removeLast()
+            heartNode.removeFromParent()
         }
     }
 }

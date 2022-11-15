@@ -21,11 +21,9 @@ class PlayerNode: SKSpriteNode {
             case .forward:
                 self.speed = 1.5
                 self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1800))
-                //self.physicsBody?.applyForce(CGVector(dx: 0, dy: 1000))
             case .backward:
                 self.speed = 1.5
                 self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1800))
-                //self.physicsBody?.applyForce(CGVector(dx: 0, dy: 1000))
             }
         } 
     }

@@ -380,9 +380,12 @@ extension GameScene: SKPhysicsContactDelegate {
         }
         
         if ((firstBody.categoryBitMask & PhysicsCategory.player.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.hunter.rawValue != 0)) {
+            if let playerNode = firstBody.node as? PlayerNode,
+               let _ = secondBody.node as? HunterNode {
+                let heartNode = hearts.removeLast()
+                heartNode.removeFromParent()
+            }
             
-            let heartNode = hearts.removeLast()
-            heartNode.removeFromParent()
         }
     }
 }

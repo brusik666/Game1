@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EE153BDA2923BF380032F28F /* jump.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = EE153BD92923BF380032F28F /* jump.mp3 */; };
 		EE2FB13C291DB2A10021080D /* HunterNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2FB13B291DB2A10021080D /* HunterNode.swift */; };
 		EE310FE3291C1E7C00013FAB /* PhysicsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE310FE2291C1E7C00013FAB /* PhysicsCategory.swift */; };
 		EE336F27291FD4C9003DD138 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EE336F25291FD4C9003DD138 /* Assets.xcassets */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		EE153BD92923BF380032F28F /* jump.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = jump.mp3; sourceTree = "<group>"; };
 		EE2FB13B291DB2A10021080D /* HunterNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HunterNode.swift; sourceTree = "<group>"; };
 		EE310FE2291C1E7C00013FAB /* PhysicsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsCategory.swift; sourceTree = "<group>"; };
 		EE336F25291FD4C9003DD138 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 		EE9F6BCB291B264700566F0C /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				EE153BD92923BF380032F28F /* jump.mp3 */,
 				EE9F6BCC291B265C00566F0C /* mainTheme.mp3 */,
 				EE33A209291D897A005AEAE1 /* shurikenSwing.wav */,
 			);
@@ -196,6 +199,7 @@
 				EE5288A62915176D00B41CAF /* LaunchScreen.storyboard in Resources */,
 				EE9F6BCD291B265C00566F0C /* mainTheme.mp3 in Resources */,
 				EE336F27291FD4C9003DD138 /* Assets.xcassets in Resources */,
+				EE153BDA2923BF380032F28F /* jump.mp3 in Resources */,
 				EE5288A32915176D00B41CAF /* Assets.xcassets in Resources */,
 				EE5288A12915176800B41CAF /* Main.storyboard in Resources */,
 			);

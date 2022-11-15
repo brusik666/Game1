@@ -16,9 +16,10 @@ class HunterNode: SKSpriteNode {
         physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: size.width/2, height: size.height))
         physicsBody?.affectedByGravity = true
         physicsBody?.allowsRotation = false
-        physicsBody?.isDynamic = true
+        physicsBody?.isDynamic = false
         physicsBody?.categoryBitMask = PhysicsCategory.hunter.rawValue
         physicsBody?.contactTestBitMask = PhysicsCategory.shuriken.rawValue
+        physicsBody?.collisionBitMask = PhysicsCategory.ground.rawValue
         setScale(0.5)
     }
     
@@ -43,29 +44,34 @@ class HunterNode: SKSpriteNode {
     }
     
     func shot() {
+        
         let projectile = createProjectile()
         addChild(projectile)
         let direction: CGPoint
         direction = CGPoint(x: position.x - UIScreen.main.bounds.width, y: position.y)
+        let shotASD = SKAction.move(to: direction, duration: 1)
+        let shotAction = SKAction.applyForce(CGVector(dx: -500, dy: 0), at: projectile.position, duration: 2)
+        let shotActionDone = SKAction.removeFromParent()
+        let shotSequence = SKAction.sequence([shotASD, shotActionDone])
+        projectile.run(shotSequence)
+    }
     
-        let throwAction = SKAction.move(to: direction, duration: 0.5)
-        let throwActionDone = SKAction.removeFromParent()
-        let thorwSequence = SKAction.sequence([throwAction, throwActionDone])
-        let waitAction = SKAction.wait(forDuration: 2)
-        let group = SKAction.group([waitAction ,thorwSequence])
-        let shotForever = SKAction.repeatForever(group)
-        projectile.run(shotForever)
-
+    func shotLoop() {
+        let oneShotAction = SKAction.run(shot)
+        let waitAction = SKAction.wait(forDuration: 1.5)
+        let shotSequence = SKAction.sequence([oneShotAction, waitAction])
+        let shotLoop = SKAction.repeatForever(shotSequence)
+        run(shotLoop)
     }
     
     private func createProjectile() -> SKShapeNode {
         let projectile = SKShapeNode(circleOfRadius: 30)
+        projectile.position = position
         projectile.fillColor = SKColor.black
-        projectile.physicsBody = SKPhysicsBody(circleOfRadius: 10)
+        projectile.physicsBody = SKPhysicsBody(circleOfRadius: 30)
         projectile.physicsBody?.affectedByGravity = false
         projectile.physicsBody?.isDynamic = true
         projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile.rawValue
-        projectile.position = CGPoint(x: position.x, y: position.y)
         
         return projectile
     }

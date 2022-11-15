@@ -7,6 +7,8 @@
 
 import Foundation
 import SpriteKit
+import GameplayKit
+import AVFoundation
 
 class GameScene: SKScene {
     
@@ -17,9 +19,18 @@ class GameScene: SKScene {
     let player = PlayerNode(imageNamed: "foxIDLE1")
     var isSoundOn: Bool = false
     var rightButtonLabel: SKLabelNode!
-    var hearts = [SKLabelNode]()
+    var hearts = [SKSpriteNode]()
+    var hunters = [HunterNode]()
     var timerLabel: SKLabelNode!
-    private var eggsCollected = 0
+    private var soundFXPlayer: AVAudioPlayer? = nil
+    
+    private var eggsCollected = 0 {
+        didSet {
+            if eggsCollected == allEggsCount {
+                
+            }
+        }
+    }
     private var allEggsCount = 0
     
     override init(size: CGSize) {
@@ -31,13 +42,9 @@ class GameScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
-        print("didMove")
         physicsWorld.contactDelegate = self
         self.view?.isMultipleTouchEnabled = true
-        if isSoundOn {
-            //let backGroundMusic = SKAudioNode(fileNamed: "mainTheme")
-            //addChild(backGroundMusic)
-        }
+        
         createTerrain()
         setupPlayerNode()
         setCamera()
@@ -94,20 +101,21 @@ class GameScene: SKScene {
     private func createHearts() {
         var distance = CGFloat(0)
         for _ in 0...2 {
-            let heartLabel = SKSpriteNode(imageNamed: "heart")
-            heartLabel.name = "heart"
-            heartLabel.xScale = 0.5
-            heartLabel.yScale = 0.5
-            heartLabel.position = CGPoint(x: -size.width/2 + heartLabel.size.width + distance, y: size.height/2 - heartLabel.size.height/2)
-            heartLabel.zPosition = 3
-            cameraNode.addChild(heartLabel)
+            let heartNode = SKSpriteNode(imageNamed: "heart")
+            heartNode.name = "heart"
+            heartNode.xScale = 0.5
+            heartNode.yScale = 0.5
+            heartNode.position = CGPoint(x: -size.width/2 + heartNode.size.width + distance, y: size.height/2 - heartNode.size.height/2)
+            heartNode.zPosition = 3
+            hearts.append(heartNode)
+            cameraNode.addChild(heartNode)
             
             let scaleAnimation = SKAction.scale(to: 0.55, duration: 0.2)
             let reverseScale = SKAction.scale(to: 0.5, duration: 0.2)
             let sequence = SKAction.sequence([scaleAnimation, reverseScale])
             let loop = SKAction.repeatForever(sequence)
-            heartLabel.run(loop)
-            distance += heartLabel.size.width
+            heartNode.run(loop)
+            distance += heartNode.size.width
         }
     }
     
@@ -134,20 +142,21 @@ class GameScene: SKScene {
             if i % 2 != 0 {
                 let groundNode = createGroundNode(xPosition: xPosition, width: width)
                 addChild(groundNode)
-                if i != 1 {
-                    let upperHighGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width / 3 * 2)
-                    upperHighGroundNode.name = "upperHighGround"
-                    addChild(upperHighGroundNode)
-                    createEggsNodes(parentNode: upperHighGroundNode)
-                }
+                let upperHighGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height, width: width / 3 * 2)
+                upperHighGroundNode.name = "upperHighGround"
+                addChild(upperHighGroundNode)
+                createEggsNodes(parentNode: upperHighGroundNode)
             } else {
                 let highGroundNode = createHighGroundNode(xPosition: xPosition, yPosition: frame.height/2, width: width/2)
                 highGroundNode.name = "highGround"
                 addChild(highGroundNode)
-                let hunter = createHunterNode(xPosition: xPosition - highGroundNode.size.width/2, yPosition: highGroundNode.position.y)
+                let hunter = createHunterNode(xPosition: xPosition - highGroundNode.size.width/2, yPosition: highGroundNode.position.y + player.size.height/4)
+                //hunters.append(hunter)
                 highGroundNode.addChild(hunter)
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     hunter.move()
+                    //hunter.shotLoop()
                 }
                 
             }
@@ -163,7 +172,9 @@ class GameScene: SKScene {
         groundNode.size.height = frame.height/5
         groundNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: width, height: groundNode.size.height - 20))
         groundNode.physicsBody?.isDynamic = false
-        groundNode.physicsBody?.collisionBitMask = PhysicsCategory.none.rawValue
+        groundNode.physicsBody?.categoryBitMask = PhysicsCategory.ground.rawValue
+        groundNode.physicsBody?.contactTestBitMask = PhysicsCategory.player.rawValue
+        groundNode.physicsBody?.collisionBitMask = 0
         groundNode.position.x = xPosition
         return groundNode
     }
@@ -174,6 +185,9 @@ class GameScene: SKScene {
         highGroundNode.size.width = width
         highGroundNode.size.height = frame.height/10
         highGroundNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: width, height: highGroundNode.size.height))
+        highGroundNode.physicsBody?.categoryBitMask = PhysicsCategory.ground.rawValue
+        highGroundNode.physicsBody?.contactTestBitMask = PhysicsCategory.player.rawValue
+        highGroundNode.physicsBody?.collisionBitMask = 0
         highGroundNode.physicsBody?.isDynamic = false
         highGroundNode.position.x = xPosition
         highGroundNode.position.y = yPosition
@@ -261,7 +275,7 @@ class GameScene: SKScene {
         cameraNode = SKCameraNode()
         camera = cameraNode
         let yConstraint = SKConstraint.positionY(SKRange(lowerLimit: 0 + frame.size.height, upperLimit: backgroundNode.size.height - frame.height))
-        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + frame.size.width, upperLimit: backgroundNode.frame.maxX * 2 - frame.size.width/2 - frame.size.width/4))
+        let xConstraint = SKConstraint.positionX(SKRange(lowerLimit: 0 + frame.size.width, upperLimit: backgroundNode.frame.maxX * 2 - frame.size.width))
         cameraNode.setScale(2)
         cameraNode.constraints = [xConstraint, yConstraint]
         addChild(cameraNode)
@@ -279,6 +293,20 @@ class GameScene: SKScene {
         cameraNode.run(cameraMove)
     }
     
+    private func playSoundFile(name: String) {
+        guard isSoundOn else { return }
+        let soundUrl = Bundle.main.url(forResource: name, withExtension: "mp3")
+        do {
+            soundFXPlayer = try AVAudioPlayer(contentsOf: soundUrl!)
+            soundFXPlayer?.volume = 0.5
+            if player.isOnGround {
+                soundFXPlayer!.play()
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
     private func handleControlButtonsTaps(sender: String) {
         switch sender {
         case "leftButton":
@@ -287,7 +315,9 @@ class GameScene: SKScene {
             player.run(direction: .forward)
         case "fireButton":
             player.throwShuriken()
+            playSoundFile(name: "shurikenSwing")
         case "jumpButton":
+            playSoundFile(name: "jump")
             player.jump()
             
         default: break
@@ -296,6 +326,7 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         updateCamera()
+        
     }
 }
 
@@ -312,8 +343,7 @@ extension GameScene: SKPhysicsContactDelegate {
         }
         
         if ((firstBody.categoryBitMask & PhysicsCategory.player.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.egg.rawValue != 0)) {
-          if let player = firstBody.node as? SKSpriteNode,
-             let node = secondBody.node as? SKSpriteNode, node.name == "egg" {
+          if let node = secondBody.node as? SKSpriteNode, node.name == "egg" {
               node.removeFromParent()
               let eggLabel = cameraNode.childNode(withName: "eggsRemainLabel") as? SKLabelNode
               eggsCollected += 1
@@ -327,6 +357,15 @@ extension GameScene: SKPhysicsContactDelegate {
                 hunter.removeFromParent()
                 shuriken.removeFromParent()
             }
+        }
+        
+        if ((firstBody.categoryBitMask & PhysicsCategory.player.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.ground.rawValue != 0)) {
+            player.isOnGround = true
+            player.speed = 1
+        }
+        
+        if ((firstBody.categoryBitMask & PhysicsCategory.shuriken.rawValue != 0) && (secondBody.categoryBitMask & PhysicsCategory.hunter.rawValue != 0)) {
+            
         }
     }
 }

@@ -7,20 +7,27 @@
 
 import Foundation
 import SpriteKit
+import AVFoundation
 
 class PlayerNode: SKSpriteNode {
     
     //private var health = 3
-    
     var movementDirection: MovementDirection = .forward
+    var isOnGround = true
     func jump() {
-        switch movementDirection {
-        case .forward:
-            self.physicsBody?.applyImpulse(CGVector(dx: 100, dy: 1000))
-        case .backward:
-            self.physicsBody?.applyImpulse(CGVector(dx: -100, dy: 1000))
-        }
-        
+        if isOnGround {
+            isOnGround = false
+            switch movementDirection {
+            case .forward:
+                self.speed = 1.5
+                self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1800))
+                //self.physicsBody?.applyForce(CGVector(dx: 0, dy: 1000))
+            case .backward:
+                self.speed = 1.5
+                self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1800))
+                //self.physicsBody?.applyForce(CGVector(dx: 0, dy: 1000))
+            }
+        } 
     }
     
     private func runAnimation(direction: MovementDirection) {
@@ -43,7 +50,7 @@ class PlayerNode: SKSpriteNode {
     
     func run(direction: MovementDirection) {
         let xVector = direction == .forward ? CGFloat(50): CGFloat(-50)
-        let moveAction = SKAction.move(by: CGVector(dx: xVector, dy: 0), duration: 0.2)
+        let moveAction = SKAction.move(by: CGVector(dx: xVector, dy: 0), duration: 0.15)
         let repeatMove = SKAction.repeatForever(moveAction)
         runAnimation(direction: direction)
         run(repeatMove, withKey: "run")
@@ -56,6 +63,7 @@ class PlayerNode: SKSpriteNode {
     }
     
     func idleAnimation() {
+    
         var idleTextures = [SKTexture]()
         for i in 1...6 {
             if movementDirection == .forward {
@@ -82,13 +90,11 @@ class PlayerNode: SKSpriteNode {
             shuriken.position = CGPoint(x: parent!.position.x - shuriken.size.width * 3, y: parent!.position.y)
         }
         addChild(shuriken)
-    
+
         let throwAction = SKAction.move(to: direction, duration: 0.5)
         let throwActionDone = SKAction.removeFromParent()
         let thorwSequence = SKAction.sequence([throwAction, throwActionDone])
-        let soundAction = SKAction.playSoundFileNamed("shurikenSwing", waitForCompletion: false)
-        let group = SKAction.group([thorwSequence, soundAction])
-        shuriken.run(group)
+        shuriken.run(thorwSequence)
     }
     
     private func createShurikenNode() -> SKSpriteNode {
